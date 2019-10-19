@@ -3,7 +3,11 @@
 using namespace std;
 // Default constructor
 Puzzle::Puzzle() :
-	config(DEFAULT_NUM_ROW_COL * DEFAULT_NUM_ROW_COL) {}
+	num_row_col(DEFAULT_NUM_ROW_COL), config(num_row_col* num_row_col) {}
+
+// Custom constructor
+Puzzle::Puzzle(int nrc) :
+	num_row_col(nrc), config(num_row_col* num_row_col) {}
 
 // Deconstructor
 // No memory on the heap atm
