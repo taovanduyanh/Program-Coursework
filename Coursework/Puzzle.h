@@ -12,6 +12,7 @@ class Puzzle {
 public:
 	const static int DEFAULT_NUM_ROW_COL = 4;
 	Puzzle();
+	Puzzle(int nrc);
 	~Puzzle();
 	friend ostream& operator<<(ostream& ostr, const Puzzle& pzl);
 	bool is_existed(const int& index, const int& curr_value) const;
@@ -20,6 +21,7 @@ public:
 	void create_manual_config();
 	void create_pseudo_random_config();
 private:
+	int num_row_col;
 	vector<int> config;
 };
 

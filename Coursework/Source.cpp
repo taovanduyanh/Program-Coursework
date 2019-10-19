@@ -2,7 +2,7 @@
 Newcaslte University
 Author: Tao Van Duy Anh
 Student ID: 190332316
-Version: 0.0.7
+Version: 0.0.8
 */
 #include "Puzzle.h"
 
