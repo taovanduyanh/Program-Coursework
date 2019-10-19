@@ -4,6 +4,7 @@ Not done yet (currently at file)
 //////////////////////////////////////////////
 
 Tasks:
+
 ✔ Create a program that will allow a user to manually type in a 15-puzzle configuration
 using numbers 1 through 20 (inclusive)
 ○ Make sure not to allow repeated numbers for the blocks
