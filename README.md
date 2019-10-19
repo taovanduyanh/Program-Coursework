@@ -92,5 +92,5 @@ reverse column = 2341
 
 ● Check your solution for correctness with friends and colleagues in the class
 
-● Update your solution to allow the user to specify the size of the 15-Puzzle problem (e.g.,
+✔ Update your solution to allow the user to specify the size of the 15-Puzzle problem (e.g.,
 25-Puzzle, 36-Puzzle, 49-Puzzle)
