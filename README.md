@@ -13,7 +13,7 @@ using numbers 1 through 20 (inclusive)
 (inclusive) in a pseudo random way
 ○ The number of these configurations can be chosen by the user
 
-● Produce a text file (the 15-File) that stores 15-Puzzle configurations that your program
+✔ Produce a text file (the 15-File) that stores 15-Puzzle configurations that your program
 generates
 
 ○ Text file format should start with a single number (indicating the number of
