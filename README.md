@@ -15,31 +15,49 @@ using numbers 1 through 20 (inclusive)
 
 ● Produce a text file (the 15-File) that stores 15-Puzzle configurations that your program
 generates
+
 ○ Text file format should start with a single number (indicating the number of
 15-Puzzle squares) followed by the squares themselves (see below). Block
 labels should be separated by a space and each row should be on a new line
+
 2
+
 1 2 3 4
+
 5 6 7 8
+
 9 10 11 12
+
 13 20 15
+
 1 3 2 4
+
 5 6 7 8
+
 9 10 11 12
+
 13 20 15
 
 ● Allow your program to read in a file (the 15-File) and deduce how many continuous rows,
 continuous columns, reverse continuous rows and reverse continuous columns are
 possible for all turns from the given configuration and print this to screen
-2
+
 1
+
 1 2 3 4
+
 5 6 7 8
+
 9 10 11 12
+
 13 20 15
+
 row = 2302
+
 column = 2344
+
 reverse row = 2341
+
 reverse column = 2341
 
 ● Allow your program to output its findings to a text file (the Solution-File) shown using the
@@ -73,21 +91,37 @@ valid 15-Puzzle configuration
 numbers shown here may be indicative only and not a true representation of an accurate
 solution):
 2
+
 1 2 3 4
+
 5 6 7 8
+
 9 10 11 12
+
 13 20 15
+
 row = 2302
+
 column = 2344
+
 reverse row = 2341
+
 reverse column = 2341
+
 (total for row & column, including reverse, in this configuration)
+
 2 = 22
+
 3 = 14
+
 4 = 8
+
 (total for row and column, including reverse, for all valid turns)
+
 2 = 235223
+
 3 = 34563
+
 4 = 456
 
 ● Check your solution for correctness with friends and colleagues in the class
