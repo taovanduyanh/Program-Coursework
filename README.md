@@ -90,6 +90,7 @@ valid 15-Puzzle configuration
 ● Enhance your Solution-File to add the values for partial continuous solutions (the
 numbers shown here may be indicative only and not a true representation of an accurate
 solution):
+
 2
 
 1 2 3 4
