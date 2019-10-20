@@ -7,16 +7,18 @@ Tasks:
 
 ✔ Create a program that will allow a user to manually type in a 15-puzzle configuration
 using numbers 1 through 20 (inclusive)
-○ Make sure not to allow repeated numbers for the blocks
+ 
+ ○ Make sure not to allow repeated numbers for the blocks
 
 ✔ Create a program that will create 15-Puzzle configurations using numbers 1 through 20
 (inclusive) in a pseudo random way
-○ The number of these configurations can be chosen by the user
+  
+  ○ The number of these configurations can be chosen by the user
 
 ✔ Produce a text file (the 15-File) that stores 15-Puzzle configurations that your program
 generates
 
-○ Text file format should start with a single number (indicating the number of
+  ○ Text file format should start with a single number (indicating the number of
 15-Puzzle squares) followed by the squares themselves (see below). Block
 labels should be separated by a space and each row should be on a new line
 
