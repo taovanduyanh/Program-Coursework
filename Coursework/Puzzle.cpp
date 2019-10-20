@@ -14,8 +14,22 @@ Puzzle::Puzzle(int nrc) :
 // Could remove this later
 Puzzle::~Puzzle() {}
 
-// make this operator do the file stuff
+// Print out the configuration to the screen or file
 ostream& operator<<(ostream& ostr, const Puzzle& pzl) {
+	for (const int& value : pzl.config) {
+		ptrdiff_t curr_index = find(pzl.config.begin(), pzl.config.end(), value) - pzl.config.begin() + 1;
+
+		if (value != 0)
+			ostr << value << '\t';
+		else
+			ostr << "";
+
+		// check if it's the end of row
+		if (curr_index % pzl.num_row_col == 0)
+			ostr << '\n';
+	}
+
+	ostr << '\n';
 
 	return ostr;
 }
@@ -43,25 +57,6 @@ bool Puzzle::is_in_range(const int& curr_value) const {
 	return true;
 }
 
-// Print out the configuration
-// Could possibly do one loop only?
-void Puzzle::print_config() const {
-	cout << "The latest configuration is:" << "\n\n";
-
-	for (const int& value : config) {
-		ptrdiff_t curr_index = find(config.begin(), config.end(), value) - config.begin() + 1;
-
-		if (value != 0)
-			cout << value << '\t';
-		else 
-			cout << "";
-
-		// check if it's the end of row
-		if (curr_index % DEFAULT_NUM_ROW_COL == 0)
-			cout << "\n\n";
-	}
-}
-
 // Create a configuration manually 
 void Puzzle::create_manual_config() {
 	int blank_index = config.size() - 1;
@@ -82,19 +77,77 @@ void Puzzle::create_manual_config() {
 	}
 
 	config.at(blank_index) = 0;
-	print_config();
 }
 
 void Puzzle::create_pseudo_random_config() {
-	for (int j = 0; j < config.size(); j++) {
+	int blank_index = config.size() - 1;
+
+	for (int i = 0; i < blank_index; i++) {
 		int random_num = rand() % 20 + 1;
 
-		while (is_existed(j, random_num))
+		while (is_existed(i, random_num))
 			random_num = rand() % 20 + 1;
 
-		config[j] = random_num;
+		config.at(i) = random_num;
 	}
 
-	config[config.size() - 1] = 0;
-	print_config();
+	config.at(blank_index) = 0;
+}
+
+///////////////////////////		To be used in main()	///////////////////////////
+
+// Get the number of pseudo-random configurations from user
+int get_num_pseudo_configs() {
+	int num_configs;
+
+	cout << "Please enter the number of pseudo-random configurations you would like to have" << endl;
+	cin >> num_configs;
+
+	while (!cin || num_configs <= 0) {
+		cout << "Please enter a positive number (greater than 0)" << endl;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin >> num_configs;
+	}
+
+	return num_configs;
+}
+
+// Start up the manual configuration part
+void set_manual_config() {
+	cout << "Welcome to 15-puzzle configuration!" << "\n\n";
+	Puzzle manual_config;
+
+	// ask user to create the configuration manually
+	manual_config.create_manual_config();
+	cout << "\nThe configuration you've just entered:\n" << manual_config;
+}
+
+// Start up the pseudo-random configuration part
+void set_pseudo_configs() {
+	srand(time(NULL)); // Prevent the same sequence of randomness among the configurations
+	vector<Puzzle> pseudo_configs(get_num_pseudo_configs());
+
+	for (Puzzle& config : pseudo_configs) {
+		config.create_pseudo_random_config();
+		cout << config;
+	}
+
+	// Produce a text file part
+	create_configs_file(pseudo_configs);
+}
+
+// Create a file that stores the created configurations
+void create_configs_file(const vector<Puzzle>& configs_vector) {
+	ofstream configs_file("Configurations.txt");
+
+	if (configs_file.is_open()) {
+		configs_file << configs_vector.size() << endl;
+		for (const Puzzle& config : configs_vector) {
+			configs_file << config;
+		}
+		configs_file.close();
+	}
+	else
+		cout << "Error: unable to open file";
 }

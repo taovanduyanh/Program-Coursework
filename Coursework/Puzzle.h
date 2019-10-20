@@ -17,7 +17,6 @@ public:
 	friend ostream& operator<<(ostream& ostr, const Puzzle& pzl);
 	bool is_existed(const int& index, const int& curr_value) const;
 	bool is_in_range(const int& curr_value) const;
-	void print_config() const;
 	void create_manual_config();
 	void create_pseudo_random_config();
 private:
@@ -27,3 +26,6 @@ private:
 
 // Function for main
 int get_num_pseudo_configs();
+void set_manual_config();
+void set_pseudo_configs();
+void create_configs_file(const vector<Puzzle>& configs_vector);
