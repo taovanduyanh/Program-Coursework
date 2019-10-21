@@ -3,11 +3,23 @@
 using namespace std;
 // Default constructor
 Puzzle::Puzzle() :
-	num_row_col(DEFAULT_NUM_ROW_COL), config(num_row_col* num_row_col) {}
+	num_row_col(DEFAULT_NUM_ROW_COL), config() {
+	int config_size(num_row_col * num_row_col);
+	config.resize(config_size);
+
+	if (num_row_col <= 0)
+		throw invalid_argument("The size must be higher than zero. Size gotten: " + to_string(num_row_col));
+}
 
 // Custom constructor
 Puzzle::Puzzle(int nrc) :
-	num_row_col(nrc), config(num_row_col* num_row_col) {}
+	num_row_col(nrc), config() {
+	int config_size(num_row_col * num_row_col);
+	config.resize(config_size);
+
+	if (num_row_col <= 0)
+		throw invalid_argument("The size must be higher than zero. Size gotten: " + to_string(num_row_col));
+}
 
 // Deconstructor
 // No memory on the heap atm
@@ -59,9 +71,7 @@ bool Puzzle::is_in_range(const int& curr_value) const {
 
 // Create a configuration manually 
 void Puzzle::create_manual_config() {
-	int blank_index = config.size() - 1;
-
-	for (int i = 0; i < blank_index; i++) {
+	for (int i = 0; i < config.size() - 1; i++) {
 		int temp_val_holder;
 		cout << "Please enter a number into the configuration at position " << i << endl;
 		cin >> temp_val_holder;
@@ -76,13 +86,11 @@ void Puzzle::create_manual_config() {
 		config.at(i) = temp_val_holder;
 	}
 
-	config.at(blank_index) = 0;
+	config.at(config.size() - 1) = 0;
 }
 
 void Puzzle::create_pseudo_random_config() {
-	int blank_index = config.size() - 1;
-
-	for (int i = 0; i < blank_index; i++) {
+	for (int i = 0; i < config.size() - 1; i++) {
 		int random_num = rand() % 20 + 1;
 
 		while (is_existed(i, random_num))
@@ -91,7 +99,7 @@ void Puzzle::create_pseudo_random_config() {
 		config.at(i) = random_num;
 	}
 
-	config.at(blank_index) = 0;
+	config.at(config.size() - 1) = 0;
 }
 
 ///////////////////////////		To be used in main()	///////////////////////////
@@ -115,17 +123,23 @@ int get_num_pseudo_configs() {
 
 // Start up the manual configuration part
 void set_manual_config() {
-	cout << "Welcome to 15-puzzle configuration!" << "\n\n";
-	Puzzle manual_config;
+	try {
+		Puzzle manual_config;
+		cout << "Welcome to 15-puzzle configuration!" << "\n\n";
+		// ask user to create the configuration manually
+		manual_config.create_manual_config();
+		cout << "\nThe configuration you've just entered:\n" << manual_config;
+	}
+	catch (invalid_argument iae) {
+		cout << "Unable to create the configuration: " << iae.what() << endl;
+		exit(1);
+	}
 
-	// ask user to create the configuration manually
-	manual_config.create_manual_config();
-	cout << "\nThe configuration you've just entered:\n" << manual_config;
 }
 
 // Start up the pseudo-random configuration part
 void set_pseudo_configs() {
-	srand(time(NULL)); // Prevent the same sequence of randomness among the configurations
+	srand((unsigned int) time(0)); // Prevent the same sequence of randomness among the configurations
 	vector<Puzzle> pseudo_configs(get_num_pseudo_configs());
 
 	for (Puzzle& config : pseudo_configs) {
