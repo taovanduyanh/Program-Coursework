@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 #include <algorithm>
 #include <fstream>
@@ -13,8 +14,8 @@ using namespace std;
 class Puzzle {
 public:
 	const static int DEFAULT_NUM_ROW_COL = 4;
-	Puzzle();
-	Puzzle(int nrc);
+	Puzzle() throw (invalid_argument);
+	Puzzle(int nrc) throw (invalid_argument);
 	~Puzzle();
 	friend ostream& operator<<(ostream& ostr, const Puzzle& pzl);
 	bool is_existed(const int& index, const int& curr_value) const;
@@ -25,9 +26,3 @@ private:
 	int num_row_col;
 	vector<int> config;
 };
-
-// Function for main
-int get_num_pseudo_configs();
-void set_manual_config();
-void set_pseudo_configs();
-void create_configs_file(const vector<Puzzle>& configs_vector);
