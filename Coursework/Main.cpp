@@ -16,12 +16,13 @@ int main() {
 	cout << "TESTING PHASE" << endl;
 	try {
 		vector<vector<int>> test = read_configs_file("Configurations.txt");
-		for (int i = 0; i < test.size(); i++) {
-			for (int j = 0; j < test[i].size(); j++) {
+		vector<vector<int>> test2 = sort_configs(test);
+		for (int i = 0; i < test2.size(); i++) {
+			for (int j = 0; j < test2[i].size(); j++) {
 				int t = j + 1;
-				cout << test[i][j] << '\t';
+				cout << test2[i][j] << '\t';
 
-				if (t % 4 == 0 || j == (test[i].size() - 1))
+				if (t % 4 == 0 || j == (test2[i].size() - 1))
 					cout << endl;
 			}
 			cout << endl;

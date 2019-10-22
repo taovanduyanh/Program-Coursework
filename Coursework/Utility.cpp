@@ -63,7 +63,22 @@ void write_configs_file(const vector<Puzzle>& configs_vector) {
 		cout << "Error: unable to open file";
 }
 
+// Sort the configurations' copies to check for numbers of continuous rows/cols
+// Could make this into a pointer insted? As well as do it in Puzzle
+vector<vector<int>> sort_configs(vector<vector<int>>& configs) {
+	vector<vector<int>> sorted_configs;
+
+	for (vector<int> config_copy : configs) {
+		sort(config_copy.begin(), config_copy.end());
+		sorted_configs.push_back(config_copy);
+	}
+
+	return sorted_configs;
+}
+
 // change the name to create vector or add num
+// this one has all the current function for calculating the rows and stuffs i guess 
+// IMPORTANT: break this into multiple functions later
 vector<vector<int>> read_configs_file(string file_name) throw (invalid_argument) {
 	vector<vector<int>> configs;
 	ifstream configs_file(file_name);
