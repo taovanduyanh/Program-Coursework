@@ -1,8 +1,18 @@
 ///////////////////////////		To be used in main()	///////////////////////////
 #include "Utility.h"
 
+Utility::Utility() {
+	num_row_col = new int();
+	num_configs = new int();
+}
+
+Utility::~Utility() {
+	delete num_row_col;
+	delete num_configs;
+}
+
 // Get the number of pseudo-random configurations from user
-int get_num_pseudo_configs() {
+int Utility::get_num_pseudo_configs() {
 	int num_configs;
 
 	cout << "Please enter the number of pseudo-random configurations you would like to have" << endl;
@@ -18,8 +28,38 @@ int get_num_pseudo_configs() {
 	return num_configs;
 }
 
+// Get the number of possible continuous 
+// e.g. 1234, 2345, 3456 are continuous
+int Utility::get_num_possible_cont_blocks(vector<int> config_copy) {
+	int num_cont = 0;
+	int num_shifts_made = 0;
+	int shift = *num_row_col - 2;
+	int num_steps = *num_row_col - 1;
+
+	// Sort the copy configuration
+	sort(config_copy.begin(), config_copy.end());
+
+	for (int first_index = 0, second_index = 1; second_index < config_copy.size(); first_index++, second_index++) {
+		if (config_copy.at(second_index) - config_copy.at(first_index) != 1)
+			break;
+		else
+			num_shifts_made++;
+
+		// change this 3 to num_row_col - 1 somehow..
+		// and the -= 2 as well lol (num_row_col - 2?)
+		if (num_shifts_made % num_steps == 0) {
+			first_index -= shift;
+			second_index -= shift;
+			num_shifts_made = 0;	// reset the number of step here
+			num_cont++;
+		}
+	}
+
+	return num_cont;
+}
+
 // Start up the manual configuration part
-void set_manual_config() {
+void Utility::set_manual_config() {
 	try {
 		Puzzle manual_config;
 		cout << "Welcome to 15-puzzle configuration!" << "\n\n";
@@ -35,7 +75,7 @@ void set_manual_config() {
 }
 
 // Start up the pseudo-random configuration part
-void set_pseudo_configs() {
+void Utility::set_pseudo_configs() {
 	srand((unsigned int)time(0)); // Prevent the same sequence of randomness among the configurations
 	vector<Puzzle> pseudo_configs(get_num_pseudo_configs());
 
@@ -48,13 +88,32 @@ void set_pseudo_configs() {
 	write_configs_file(pseudo_configs);
 }
 
+void Utility::count_cont_blocks_all_turns() {
+	// Lambda function - factorial
+	function<int(int)> fac;
+	fac= [&fac](int value) {
+		int result = 1;
+
+		if (value > 1)
+			result *= value * fac(value - 1);
+
+		return result;
+	};
+
+	cout << "testing: " << fac(4) << endl;
+
+	for (const vector<int>& config : configs) {
+		int num_possible_cont_blocks = get_num_possible_cont_blocks(config);
+	}
+}
+
 // Create a file that stores the created configurations
-void write_configs_file(const vector<Puzzle>& configs_vector) {
+void Utility::write_configs_file(const vector<Puzzle>& configs) {
 	ofstream configs_file("Configurations.txt");
 
 	if (configs_file) {
-		configs_file << configs_vector.size() << endl;
-		for (const Puzzle& config : configs_vector) {
+		configs_file << configs.size() << '\n';
+		for (const Puzzle& config : configs) {
 			configs_file << config;
 		}
 		configs_file.close();
@@ -63,32 +122,39 @@ void write_configs_file(const vector<Puzzle>& configs_vector) {
 		cout << "Error: unable to open file";
 }
 
-// change the name to create vector or add num
-vector<vector<int>> read_configs_file(string file_name) throw (invalid_argument) {
-	vector<vector<int>> configs;
+// Get the configurations from the file
+// remove configs as argument as well
+void Utility::get_configs(ifstream& configs_file) {
+	int num_lines = 0;	// number of lines excluding the empty line; it's used to calculate the number of rows and cols
+	string line;
+	configs_file >> *num_configs;
+	configs.resize(*num_configs);
+	configs_file.ignore(numeric_limits<streamsize>::max(), '\n'); // ignore the first line of the file
+
+	for (vector<int>& config : configs) {
+		while (getline(configs_file, line) && !line.empty()) {
+			num_lines++;
+			int value;
+			istringstream row(line);
+
+			while (row >> value)
+				config.push_back(value);
+		}
+	}
+
+	*num_row_col = num_lines / *num_configs;
+}
+
+// Make this void instead
+void Utility::read_configs_file(string file_name) throw (invalid_argument) {
 	ifstream configs_file(file_name);
 
+	// read the file
 	if (configs_file) {
-		string line;
-		int num_configs;
-		configs_file >> num_configs;
-		configs.resize(num_configs);
-		configs_file.ignore(numeric_limits<streamsize>::max(), '\n'); // ignore the first line of the file
-
-		for (vector<int>& config : configs) {
-			while (getline(configs_file, line) && !line.empty()) {
-				int value;
-				istringstream row(line);
-
-				while (row >> value)
-					config.push_back(value);
-			}
-		}
+		get_configs(configs_file);
 	}
 	else
 		throw invalid_argument("Error: " + file_name + " does not exist");
 
 	configs_file.close();
-
-	return configs;
 }
