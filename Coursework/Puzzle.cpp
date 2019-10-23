@@ -49,9 +49,6 @@ ostream& operator<<(ostream& ostr, const Puzzle& pzl) {
 // Check if the input has already been inserted into the puzzle (configuration)
 // not known yet the efficiency
 bool Puzzle::is_existed(const int& index, const int& curr_value) const {
-	if (index == 0)
-		return false;
-	
 	for (int i = 0; i < index; i++) {
 		if (config[i] == curr_value)
 			return true;
