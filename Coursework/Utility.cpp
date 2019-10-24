@@ -58,6 +58,7 @@ int Utility::get_num_possible_cont_blocks(vector<int> config_copy) {
 	return num_cont;
 }
 
+// Print out the configurartion with its continuous row
 void Utility::print_num_cont_blocks_all(const int& partial_num) {
 	for (const vector<int>& config : configs) {
 		unsigned int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
@@ -123,7 +124,7 @@ unsigned long long int Utility::count_cont_blocks_all(const vector<int>& config,
 
 	// change this part later on
 	// i.e. change the num_row_col: do it with Puzzle instead
-	unsigned long long int num_valid_cont_blocks = get_num_possible_cont_blocks(config) * get_poss_orderings() * (*num_row_col) * fac(config.size() - partial_num) / 2;
+	unsigned long long int num_valid_cont_blocks = get_num_possible_cont_blocks(config) * get_poss_orderings() * fac(config.size() - partial_num) / 2;
 	return num_valid_cont_blocks;
 }
 
