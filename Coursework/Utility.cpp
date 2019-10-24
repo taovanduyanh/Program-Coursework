@@ -41,7 +41,7 @@ int Utility::get_num_possible_cont_blocks(vector<int> config_copy) {
 
 	// There is possibly a better way?
 	for (int i = 1; i < config_copy.size(); i++) {
-		if (config_copy.at(i) - config_copy.at(i - 1) == 1) {
+		if (config_copy.at(i) - config_copy.at((_int64) i - 1) == 1) {
 			num_shifts_made++;
 
 			if (num_shifts_made % num_steps == 0) {
@@ -56,6 +56,24 @@ int Utility::get_num_possible_cont_blocks(vector<int> config_copy) {
 	}
 
 	return num_cont;
+}
+
+void Utility::print_num_cont_blocks_all(const int& partial_num) {
+	for (const vector<int>& config : configs) {
+		unsigned int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
+		for (int j = 0; j < config.size(); j++) {
+			int t = j + 1;
+			cout << config.at(j) << '\t';
+
+			if (t % 4 == 0)
+				cout << endl;
+		}
+		cout << endl;
+		cout << "row = " << num_cont_blocks_all << '\n';
+		cout << "column = " << num_cont_blocks_all << '\n';
+		cout << "reverse row = " << num_cont_blocks_all << '\n';
+		cout << "reverse column = " << num_cont_blocks_all << "\n\n";
+	}
 }
 
 // Start up the manual configuration part
@@ -88,10 +106,9 @@ void Utility::set_pseudo_configs() {
 	write_configs_file(pseudo_configs);
 }
 
-void Utility::count_cont_blocks_all_turns() {
+unsigned long long int Utility::count_cont_blocks_all(const vector<int>& config, const int& partial_num) {
 	// Lambda function - factorial
-	function<int(int)> fac;
-	fac= [&fac](int value) {
+	function<unsigned int(int)> fac = [&fac](int value) {
 		int result = 1;
 
 		if (value > 1)
@@ -100,13 +117,14 @@ void Utility::count_cont_blocks_all_turns() {
 		return result;
 	};
 
-	for (const vector<int>& config : configs) {
-		int num_possible_cont_blocks = get_num_possible_cont_blocks(config);
-		cout << "reee part 1: " << num_possible_cont_blocks << endl;
-		// change this part later on
-		int num_valid_cont_blocks = (num_possible_cont_blocks * (*num_row_col - 1) * fac((config.size() - *num_row_col)) * (*num_row_col - *num_row_col + 1)) / 2;
-		cout << "reee part 2: " << num_valid_cont_blocks << endl;
-	}
+	function<int()> get_poss_orderings = [&]() {
+		return (*num_row_col) * (*num_row_col - partial_num + 1) - 1;
+	};
+
+	// change this part later on
+	// i.e. change the num_row_col: do it with Puzzle instead
+	unsigned long long int num_valid_cont_blocks = get_num_possible_cont_blocks(config) * get_poss_orderings() * (*num_row_col) * fac(config.size() - partial_num) / 2;
+	return num_valid_cont_blocks;
 }
 
 // Create a file that stores the created configurations
