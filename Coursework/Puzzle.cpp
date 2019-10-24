@@ -70,7 +70,7 @@ bool Puzzle::is_in_range(const int& curr_value) const {
 void Puzzle::create_manual_config() {
 	for (int i = 0; i < config.size() - 1; i++) {
 		int temp_val_holder;
-		cout << "Please enter a number into the configuration at position " << i << endl;
+		cout << "Please enter a number at position " << i << endl;
 		cin >> temp_val_holder;
 
 		while (!cin || !is_in_range(temp_val_holder) || is_existed(i, temp_val_holder)) {

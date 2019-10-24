@@ -81,6 +81,7 @@ void Utility::print_num_cont_blocks_all(const int& partial_num) {
 void Utility::set_manual_config() {
 	try {
 		Puzzle manual_config;
+		// Make the welcome part into a different method/function
 		cout << "Welcome to 15-puzzle configuration!" << "\n\n";
 		// ask user to create the configuration manually
 		manual_config.create_manual_config();
