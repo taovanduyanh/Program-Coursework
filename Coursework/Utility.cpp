@@ -39,19 +39,19 @@ int Utility::get_num_possible_cont_blocks(vector<int> config_copy) {
 	// Sort the copy configuration
 	sort(config_copy.begin(), config_copy.end());
 
-	for (int first_index = 0, second_index = 1; second_index < config_copy.size(); first_index++, second_index++) {
-		if (config_copy.at(second_index) - config_copy.at(first_index) != 1)
-			break;
-		else
+	// There is possibly a better way?
+	for (int i = 1; i < config_copy.size(); i++) {
+		if (config_copy.at(i) - config_copy.at(i - 1) == 1) {
 			num_shifts_made++;
 
-		// change this 3 to num_row_col - 1 somehow..
-		// and the -= 2 as well lol (num_row_col - 2?)
-		if (num_shifts_made % num_steps == 0) {
-			first_index -= shift;
-			second_index -= shift;
+			if (num_shifts_made % num_steps == 0) {
+				i -= shift;
+				num_shifts_made = 0;	// reset the number of step here
+				num_cont++;
+			}
+		}
+		else {
 			num_shifts_made = 0;	// reset the number of step here
-			num_cont++;
 		}
 	}
 
@@ -100,10 +100,12 @@ void Utility::count_cont_blocks_all_turns() {
 		return result;
 	};
 
-	cout << "testing: " << fac(4) << endl;
-
 	for (const vector<int>& config : configs) {
 		int num_possible_cont_blocks = get_num_possible_cont_blocks(config);
+		cout << "reee part 1: " << num_possible_cont_blocks << endl;
+		// change this part later on
+		int num_valid_cont_blocks = (num_possible_cont_blocks * (*num_row_col - 1) * fac((config.size() - *num_row_col)) * (*num_row_col - *num_row_col + 1)) / 2;
+		cout << "reee part 2: " << num_valid_cont_blocks << endl;
 	}
 }
 

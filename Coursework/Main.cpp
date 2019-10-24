@@ -35,10 +35,6 @@ int main() {
 		exit(1);
 	}
 
-	vector<int> test = { 1,2,3,4,5,6,7,8,9,10,11,12,13,20,15 };
-	int x = utility.get_num_possible_cont_blocks(test);
-	cout << "number of continuous: " << x << endl;
-
 	utility.count_cont_blocks_all_turns();
 
 	// Pause the console till any key is pressed
