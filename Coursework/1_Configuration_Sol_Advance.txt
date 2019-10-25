@@ -1,0 +1,17 @@
+1
+1	2	3	4	
+5	6	7	8	
+9	10	11	12	
+13	20	15	
+row = 598752000
+column = 598752000
+reverse row = 598752000
+reverse column = 598752000
+(total for row & column, including reverse, in this configuration)
+2 = 9
+3 = 6
+4 = 3
+(total for row & column, including reverse, for all valid turns)
+2 = 1643933491200
+3 = 73766246400
+4 = 2395008000

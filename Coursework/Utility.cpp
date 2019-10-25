@@ -41,6 +41,75 @@ unsigned int Utility::get_num_poss_cont_blocks(const Puzzle& config, const int& 
 	return num_cont_blocks;
 }
 
+// Get number of rows within a single configuration
+// P/S: it's long cause there was no time
+unsigned int Utility::get_num_rows(const Puzzle& config, const int& partial_num) {
+	int num_row = 0;
+	int num_shift_made = 0;
+	int num_shifts_made = 0;
+	int shift = partial_num - 2;
+	int num_steps = partial_num - 1;
+
+	vector<unsigned int> config_copy = config.get_config();
+
+	for (int i = 1; i < config_copy.size(); i++) {
+		if (config_copy.at(i) - config_copy.at((_int64)i - 1) == 1) {
+			num_shifts_made++;
+
+			if (num_shifts_made % num_steps == 0 && (i + 1) % config.get_num_row_col() == 0) {
+				i++;
+				num_shifts_made = 0;	// reset the number of step here
+				num_row++;
+			}
+			else if (num_shifts_made % num_steps == 0 && (i + 1) % config.get_num_row_col() != 0) {
+				i -= shift;
+				num_shifts_made = 0;
+				num_row++;
+			}
+		}
+		else {
+			num_shifts_made = 0;	// reset the number of step here
+		}
+	}
+
+	return num_row;
+}
+
+// Get number of cols within a single configuration
+// P/S: it's long cause there was no time
+unsigned int Utility::get_num_cols(const Puzzle& config, const int& partial_num) {
+	int num_col = 0;
+	int num_shift_made = 0;
+	int num_shifts_made = 0;
+	int shift = (partial_num - 1) * config.get_num_row_col();
+	int num_steps = partial_num - 1;
+
+	vector<unsigned int> config_copy = config.get_config();
+
+	for (int i = config.get_num_row_col(), j = 0; i < config_copy.size(); i += 4) {
+		if (config_copy.at(i) - config_copy.at((_int64)i - config.get_num_row_col()) == 1) {
+			num_shifts_made++;
+
+			if (num_shifts_made % num_steps == 0 && i % config.get_num_row_col() == j) {
+				j++;
+				i = j;
+				num_shifts_made = 0;	// reset the number of step here
+				num_col++;
+			}
+			else if (num_shifts_made % num_steps == 0 && i % config.get_num_row_col() != j) {
+				i -= shift;
+				num_shifts_made = 0;
+				num_col++;
+			}
+		}
+		else {
+			num_shifts_made = 0;	// reset the number of step here
+		}
+	}
+
+	return num_col;
+}
+
 // Print out the configurartion with its continuous rows/cols/re. rows/re. cols on screen
 void Utility::print_num_cont_blocks_all(const Puzzle& puzzle, const unsigned long long int& num_cont_blocks_all) {
 	cout << puzzle;
@@ -49,13 +118,13 @@ void Utility::print_num_cont_blocks_all(const Puzzle& puzzle, const unsigned lon
 		cout << "row = " << num_cont_blocks_all << '\n';
 		cout << "column = " << num_cont_blocks_all << '\n';
 		cout << "reverse row = " << num_cont_blocks_all << '\n';
-		cout << "reverse column = " << num_cont_blocks_all << "\n\n";
+		cout << "reverse column = " << num_cont_blocks_all << '\n';
 	}
 	else {
 		cout << "row = " << num_cont_blocks_all << '\n';
 		cout << "column = " << 0 << '\n';
 		cout << "reverse row = " << 0 << '\n';
-		cout << "reverse column = " << num_cont_blocks_all << "\n\n";
+		cout << "reverse column = " << num_cont_blocks_all << '\n';
 	}
 }
 
@@ -67,13 +136,13 @@ void Utility::print_num_cont_blocks_all(ostream& ostr, const Puzzle& puzzle, con
 		ostr << "row = " << num_cont_blocks_all << '\n';
 		ostr << "column = " << num_cont_blocks_all << '\n';
 		ostr << "reverse row = " << num_cont_blocks_all << '\n';
-		ostr << "reverse column = " << num_cont_blocks_all << "\n\n";
+		ostr << "reverse column = " << num_cont_blocks_all << '\n';
 	}
 	else {
 		ostr << "row = " << num_cont_blocks_all << '\n';
 		ostr << "column = " << 0 << '\n';
 		ostr << "reverse row = " << 0 << '\n';
-		ostr << "reverse column = " << num_cont_blocks_all << "\n\n";
+		ostr << "reverse column = " << num_cont_blocks_all << '\n';
 	}
 }
 
@@ -81,14 +150,36 @@ void Utility::print_num_cont_blocks_all(ostream& ostr, const Puzzle& puzzle, con
 void Utility::print_num_cont_blocks_all(ostream& ostr, const vector<Puzzle>& configs, const vector<unsigned long long int>& nums_cont_blocks_all) {
 	for (size_t i = 0; i < configs.size(); i++) {
 		print_num_cont_blocks_all(ostr, configs.at(i), nums_cont_blocks_all.at(i));
+		ostr << '\n';
 	}
 }
 
-void Utility::print_num_partial_cont_blocks(const Puzzle& puzzle, int& partial_num) {
+void Utility::print_num_total_cont_single(const Puzzle& puzzle) {
+	cout << "(total for row & column, including reverse, in this configuration)\n";
+	cout << "2 = " << get_num_rows(puzzle, 2) + get_num_cols(puzzle, 2) << '\n';
+	cout << "3 = " << get_num_rows(puzzle, 3) + get_num_cols(puzzle, 3) << '\n';
+	cout << "4 = " << get_num_rows(puzzle, 4) + get_num_cols(puzzle, 4) << '\n';
+}
+
+void Utility::print_num_total_cont_single(ostream& ostr, const Puzzle& puzzle) {
+	ostr << "(total for row & column, including reverse, in this configuration)\n";
+	ostr << "2 = " << get_num_rows(puzzle, 2) + get_num_cols(puzzle, 2) << '\n';
+	ostr << "3 = " << get_num_rows(puzzle, 3) + get_num_cols(puzzle, 3) << '\n';
+	ostr << "4 = " << get_num_rows(puzzle, 4) + get_num_cols(puzzle, 4) << '\n';
+}
+
+void Utility::print_num_total_cont_all(const Puzzle& puzzle) {
 	cout << "(total for row & column, including reverse, for all valid turns)\n";
 	cout << "2 = " << count_cont_blocks_all(puzzle, 2) * 4 << '\n';
 	cout << "3 = " << count_cont_blocks_all(puzzle, 3) * 4 << '\n';
 	cout << "4 = " << count_cont_blocks_all(puzzle, 4) * 4 << '\n';
+}
+
+void Utility::print_num_total_cont_all(ostream& ostr, const Puzzle& puzzle) {
+	ostr << "(total for row & column, including reverse, for all valid turns)\n";
+	ostr << "2 = " << count_cont_blocks_all(puzzle, 2) * 4 << '\n';
+	ostr << "3 = " << count_cont_blocks_all(puzzle, 3) * 4 << '\n';
+	ostr << "4 = " << count_cont_blocks_all(puzzle, 4) * 4 << '\n';
 }
 
 // Start up the manual configuration part
@@ -135,10 +226,28 @@ void Utility::set_pseudo_configs() {
 	}
 }
 
-void Utility::print_num_cont_blocks_advance(const Puzzle& puzzle, int& partial_num) {
-	print_num_partial_cont_blocks(puzzle, partial_num);
+// Print out the solution (advance) on screen
+void Utility::print_num_cont_blocks_advance(const Puzzle& puzzle) {
+	print_num_total_cont_single(puzzle);
+	print_num_total_cont_all(puzzle);
 }
 
+// Print out the solution (advance) to file
+void Utility::print_num_cont_blocks_advance(ostream& ostr, const Puzzle& puzzle) {
+	print_num_total_cont_single(ostr, puzzle);
+	print_num_total_cont_all(ostr, puzzle);
+}
+
+void Utility::print_num_cont_blocks_advance(ostream& ostr, const vector<Puzzle>& puzzles, const vector<unsigned long long int>& nums_cont_blocks_all) {
+	for (int i = 0; i < puzzles.size(); i++) {
+		print_num_cont_blocks_all(ostr, puzzles.at(i), nums_cont_blocks_all.at(i));
+		print_num_total_cont_single(ostr, puzzles.at(i));
+		print_num_total_cont_all(ostr, puzzles.at(i));
+		ostr << '\n';
+	}
+}
+
+// Count the number of cont. blocks in all valid turns
 unsigned long long int Utility::count_cont_blocks_all(const Puzzle& config, const int& partial_num) {
 	if (config.get_num_row_col() < partial_num)
 		return 0;
@@ -259,6 +368,37 @@ void Utility::write_file(const vector<Puzzle>& configs, const vector<unsigned lo
 	cout << "File has been successfully written\n";
 }
 
+// Print out a single solution (advance) to file
+void Utility::write_file_advance(const Puzzle& config, const unsigned long long int& num_cont_blocks_all) {
+	ofstream configs_file(ask_file_name());
+
+	if (configs_file) {
+		configs_file << 1 << '\n';
+		print_num_cont_blocks_all(configs_file, config, num_cont_blocks_all);
+		print_num_cont_blocks_advance(configs_file, config);
+		configs_file.close();
+	}
+	else
+		cout << "Unable to open file";
+
+	cout << "File has been successfully written\n";
+}
+
+// Print out multiple solutions (advance) to file
+void Utility::write_file_advance(const vector<Puzzle>& configs, const vector<unsigned long long int>& nums_cont_blocks_all) {
+	ofstream configs_file(ask_file_name());
+
+	if (configs_file) {
+		configs_file << configs.size() << '\n';
+		print_num_cont_blocks_advance(configs_file, configs, nums_cont_blocks_all);
+		configs_file.close();
+	}
+	else
+		cout << "Unable to open file";
+
+	cout << "File has been successfully written\n";
+}
+
 // Get the configurations from the file
 // remove configs as argument as well
 void Utility::get_configs(ifstream& configs_file) {
@@ -323,10 +463,14 @@ void Utility::solve_config(const Puzzle& config) {
 	int partial_num = ask_for_num("Which partial continuous would you like to do? ", "Invalid input. Please enter a number greater than one", 1);
 	unsigned long long int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
 	print_num_cont_blocks_all(config, num_cont_blocks_all);
-	print_num_cont_blocks_advance(config, partial_num);
+	print_num_cont_blocks_advance(config);
+	cout << '\n';
 
-	if (ask_yes_no("Would you like to save the solution(s)?"))
+	if (ask_yes_no("Would you like to save the solution(s)? [basic] "))
 		write_file(config, num_cont_blocks_all);
+
+	if (ask_yes_no("Would you like to save the solution(s)? [advance] "))
+		write_file_advance(config, num_cont_blocks_all);
 }
 
 // Solve multiple configuration
@@ -337,9 +481,14 @@ void Utility::solve_config(const vector<Puzzle>& configs) {
 	for (const Puzzle& config : configs) {
 		unsigned long long int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
 		print_num_cont_blocks_all(config, num_cont_blocks_all);
+		print_num_cont_blocks_advance(config);
 		nums_cont_blocks_all.push_back(num_cont_blocks_all);
+		cout << '\n';
 	}
 
-	if (ask_yes_no("Would you like to save the solution(s)?"))
+	if (ask_yes_no("Would you like to save the solution(s)? [basic]"))
 		write_file(configs, nums_cont_blocks_all);
+
+	if (ask_yes_no("Would you like to save the solution(s)? [advance]"))
+		write_file_advance(configs, nums_cont_blocks_all);
 }

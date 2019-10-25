@@ -63,7 +63,7 @@ void Puzzle::create_manual_config(const int& nrc) {
 		throw length_error("exceed vector's maximum size = " + to_string(config.max_size()));
 
 	*num_row_col = nrc;
-	config.resize(nrc * nrc - 1);
+	config.resize((_int64) nrc * nrc - 1);
 	cout << "Please enter a value at position\n";
 
 	for (size_t i = 0; i < config.size(); i++) {
@@ -88,7 +88,7 @@ void Puzzle::create_pseudo_random_config(const int& nrc) throw (length_error) {
 		throw length_error("exceed vector's maximum size = " + to_string(config.max_size()));
 
 	*num_row_col = nrc;
-	config.resize(nrc* nrc - 1);
+	config.resize((_int64) nrc* nrc - 1);
 
 	generate_n(config.begin(), config.size(), [&]() {
 		int rand_num = rand() % (nrc * nrc + nrc) + 1;
