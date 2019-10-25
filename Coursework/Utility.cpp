@@ -2,116 +2,150 @@
 #include "Utility.h"
 
 Utility::Utility() {
-	num_row_col = new int();
-	num_configs = new int();
+	num_configs = new unsigned long long int();
 }
 
 Utility::~Utility() {
-	delete num_row_col;
 	delete num_configs;
 }
 
-// Get the number of pseudo-random configurations from user
-int Utility::get_num_pseudo_configs() {
-	int num_configs;
+// Ask the number for specific tasks (size, no. pseudo configs, partial, etc.)
+unsigned int Utility::ask_for_num(const string& msg1, const string& msg2, const int& limit) {
+	int num;
 
-	cout << "Please enter the number of pseudo-random configurations you would like to have" << endl;
-	cin >> num_configs;
+	cout << msg1;
+	cin >> num;
 
-	while (!cin || num_configs <= 0) {
-		cout << "Please enter a positive number (greater than 0)" << endl;
+	while (!cin || num <= limit) {
+		cout << msg2 + '\n';
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		cin >> num_configs;
+		cin >> num;
 	}
 
-	return num_configs;
+	return num;
 }
 
-// Get the number of possible continuous 
-// e.g. 1234, 2345, 3456 are continuous
-int Utility::get_num_possible_cont_blocks(vector<int> config_copy) {
-	int num_cont = 0;
+// Get the number of possible continuous blocks
+unsigned int Utility::get_num_poss_cont_blocks(const Puzzle& config, const int& partial_num) {
+	int num_cont_blocks = 0;
 	int num_shifts_made = 0;
-	int shift = *num_row_col - 2;
-	int num_steps = *num_row_col - 1;
+	int shift = partial_num - 2;
+	int num_steps = partial_num - 1;
 
+	vector<unsigned int> config_copy = config.get_config();
 	// Sort the copy configuration
 	sort(config_copy.begin(), config_copy.end());
+	count_num_pos_cont_blocks(config_copy, num_steps, shift, num_cont_blocks, num_shifts_made);
 
-	// There is possibly a better way?
-	for (int i = 1; i < config_copy.size(); i++) {
-		if (config_copy.at(i) - config_copy.at((_int64) i - 1) == 1) {
-			num_shifts_made++;
-
-			if (num_shifts_made % num_steps == 0) {
-				i -= shift;
-				num_shifts_made = 0;	// reset the number of step here
-				num_cont++;
-			}
-		}
-		else {
-			num_shifts_made = 0;	// reset the number of step here
-		}
-	}
-
-	return num_cont;
+	return num_cont_blocks;
 }
 
-// Print out the configurartion with its continuous row
-void Utility::print_num_cont_blocks_all(const int& partial_num) {
-	for (const vector<int>& config : configs) {
-		unsigned int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
-		for (int j = 0; j < config.size(); j++) {
-			int t = j + 1;
-			cout << config.at(j) << '\t';
+// Print out the configurartion with its continuous rows/cols/re. rows/re. cols on screen
+void Utility::print_num_cont_blocks_all(const Puzzle& puzzle, const unsigned long long int& num_cont_blocks_all) {
+	cout << puzzle;
 
-			if (t % 4 == 0)
-				cout << endl;
-		}
-		cout << endl;
+	if (puzzle.get_num_row_col() != 2) {
 		cout << "row = " << num_cont_blocks_all << '\n';
 		cout << "column = " << num_cont_blocks_all << '\n';
 		cout << "reverse row = " << num_cont_blocks_all << '\n';
 		cout << "reverse column = " << num_cont_blocks_all << "\n\n";
 	}
+	else {
+		cout << "row = " << num_cont_blocks_all << '\n';
+		cout << "column = " << 0 << '\n';
+		cout << "reverse row = " << 0 << '\n';
+		cout << "reverse column = " << num_cont_blocks_all << "\n\n";
+	}
+}
+
+// Print out the configurartion with its continuous rows/cols/re. rows/re. cols on file
+void Utility::print_num_cont_blocks_all(ostream& ostr, const Puzzle& puzzle, const unsigned long long int& num_cont_blocks_all) {
+	ostr << puzzle;
+
+	if (puzzle.get_num_row_col() != 2) {
+		ostr << "row = " << num_cont_blocks_all << '\n';
+		ostr << "column = " << num_cont_blocks_all << '\n';
+		ostr << "reverse row = " << num_cont_blocks_all << '\n';
+		ostr << "reverse column = " << num_cont_blocks_all << "\n\n";
+	}
+	else {
+		ostr << "row = " << num_cont_blocks_all << '\n';
+		ostr << "column = " << 0 << '\n';
+		ostr << "reverse row = " << 0 << '\n';
+		ostr << "reverse column = " << num_cont_blocks_all << "\n\n";
+	}
+}
+
+// Print out the configurations with their cont. rows/cols/re.rows/re.cols on file
+void Utility::print_num_cont_blocks_all(ostream& ostr, const vector<Puzzle>& configs, const vector<unsigned long long int>& nums_cont_blocks_all) {
+	for (size_t i = 0; i < configs.size(); i++) {
+		print_num_cont_blocks_all(ostr, configs.at(i), nums_cont_blocks_all.at(i));
+	}
+}
+
+void Utility::print_num_partial_cont_blocks(const Puzzle& puzzle, int& partial_num) {
+	cout << "(total for row & column, including reverse, for all valid turns)\n";
+	cout << "2 = " << count_cont_blocks_all(puzzle, 2) * 4 << '\n';
+	cout << "3 = " << count_cont_blocks_all(puzzle, 3) * 4 << '\n';
+	cout << "4 = " << count_cont_blocks_all(puzzle, 4) * 4 << '\n';
 }
 
 // Start up the manual configuration part
 void Utility::set_manual_config() {
+	int num_row_col = ask_for_num("Please enter a size for the configuration(s): ", "Invalid input. Please enter a number greater than one", 1);
+	Puzzle manual_config;
+
 	try {
-		Puzzle manual_config;
-		// Make the welcome part into a different method/function
-		cout << "Welcome to 15-puzzle configuration!" << "\n\n";
-		// ask user to create the configuration manually
-		manual_config.create_manual_config();
-		cout << "\nThe configuration you've just entered:\n" << manual_config;
+		manual_config.create_manual_config(num_row_col);
+		cout << "\nThe configuration you've entered:\n" << manual_config;
+
+		// Just config
+		if (ask_yes_no("Would you like to save the configuration(s)?"))
+			write_file(manual_config);
+
+		// Solution part
+		solve_config(manual_config);
 	}
-	catch (const invalid_argument & iae) {
-		cout << "Unable to create the configuration: " << iae.what() << endl;
-		// change this part to call the manual again as well
-		exit(1);
+	catch (const length_error & le) {
+		cout << "Unable to create configuration: " << le.what() << '\n';
 	}
 }
 
 // Start up the pseudo-random configuration part
 void Utility::set_pseudo_configs() {
-	srand((unsigned int)time(0)); // Prevent the same sequence of randomness among the configurations
-	vector<Puzzle> pseudo_configs(get_num_pseudo_configs());
+	srand((unsigned int)time(NULL)); // Prevent the same sequence of randomness among the configurations
+	int num_row_col = ask_for_num("Please enter a size for the configuration(s): ", "Invalid input. Please enter a number greater than one", 1);
+	vector<Puzzle> pseudo_configs(ask_for_num("Please enter the number of pseudo-random configurations you would like to have: ", "Invalid input. Please enter a number greater than zero", 0));
+	try {
+		for (Puzzle& config : pseudo_configs) {
+			config.create_pseudo_random_config(num_row_col);
+			cout << config << '\n';
+		}
 
-	for (Puzzle& config : pseudo_configs) {
-		config.create_pseudo_random_config();
-		cout << config;
+		// Produce a text file part
+		if (ask_yes_no("Would you like to save the configuration(s)?"))
+			write_file(pseudo_configs);
+
+		// Solution part
+		solve_config(pseudo_configs);
 	}
-
-	// Produce a text file part
-	write_configs_file(pseudo_configs);
+	catch (const length_error & le) {
+		cout << "Unable to create configuration: " << le.what() << '\n';
+	}
 }
 
-unsigned long long int Utility::count_cont_blocks_all(const vector<int>& config, const int& partial_num) {
+void Utility::print_num_cont_blocks_advance(const Puzzle& puzzle, int& partial_num) {
+	print_num_partial_cont_blocks(puzzle, partial_num);
+}
+
+unsigned long long int Utility::count_cont_blocks_all(const Puzzle& config, const int& partial_num) {
+	if (config.get_num_row_col() < partial_num)
+		return 0;
+
 	// Lambda function - factorial
-	function<unsigned int(int)> fac = [&fac](int value) {
-		int result = 1;
+	function<unsigned long long int(int)> fac = [&fac](int value) {
+		unsigned long long int result = 1;
 
 		if (value > 1)
 			result *= value * fac(value - 1);
@@ -119,64 +153,193 @@ unsigned long long int Utility::count_cont_blocks_all(const vector<int>& config,
 		return result;
 	};
 
-	function<int()> get_poss_orderings = [&]() {
-		return (*num_row_col) * (*num_row_col - partial_num + 1) - 1;
+	function<unsigned long long int(const Puzzle&)> get_poss_orderings = [&partial_num](const Puzzle& config) {
+		return (config.get_num_row_col()) * (config.get_num_row_col() - partial_num + 1) - 1;
 	};
 
 	// change this part later on
 	// i.e. change the num_row_col: do it with Puzzle instead
-	unsigned long long int num_valid_cont_blocks = get_num_possible_cont_blocks(config) * get_poss_orderings() * fac(config.size() - partial_num) / 2;
+	unsigned long long int num_valid_cont_blocks = get_num_poss_cont_blocks(config, partial_num) * get_poss_orderings(config) * fac(config.get_config().size() - partial_num) / 2;
+
+	// reverse the half in case the configuration is 2x2
+	if (config.get_num_row_col() == 2) 
+		return num_valid_cont_blocks * 2;
+
 	return num_valid_cont_blocks;
 }
 
-// Create a file that stores the created configurations
-void Utility::write_configs_file(const vector<Puzzle>& configs) {
-	ofstream configs_file("Configurations.txt");
+// Ask the user the file name
+string Utility::ask_file_name() {
+	string file_name;
+
+	cout << "Please enter the file name: ";
+	cin >> file_name;
+
+	return file_name;
+}
+
+// Ask for response [yes or no]
+bool Utility::ask_yes_no(const string& msg) {
+	char response;
+	cout << msg + " [y/n] ";
+	cin >> response;
+
+	while (!cin || (response != 'y' && response != 'n')) {
+		cout << "Invalid input. Please enter either 'y' or 'n'\n";
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin >> response;
+	}
+
+	if (response == 'y')
+		return true;
+
+	return false;
+}
+
+// Create a file that stores one configuration
+void Utility::write_file(const Puzzle& config) {
+	ofstream configs_file(ask_file_name());
+
+	if (configs_file) {
+		configs_file << 1 << '\n';
+		configs_file << config;
+		configs_file.close();
+	}
+	else
+		cout << "Unable to open file";
+
+	cout << "File has been successfully written\n";
+}
+
+// Create a file that stores multiple configurations
+void Utility::write_file(const vector<Puzzle>& configs) {
+	ofstream configs_file(ask_file_name());
 
 	if (configs_file) {
 		configs_file << configs.size() << '\n';
 		for (const Puzzle& config : configs) {
-			configs_file << config;
+			configs_file << config << '\n';
 		}
 		configs_file.close();
 	}
 	else
-		cout << "Error: unable to open file";
+		cout << "Unable to open file";
+
+	cout << "File has been successfully written\n";
+}
+
+// Create a file that stores one configuration and its continuous rows/cols/re. rows/re. cols
+void Utility::write_file(const Puzzle& config, const unsigned int& num_cont_blocks_all) {
+	ofstream configs_file(ask_file_name());
+
+	if (configs_file) {
+		configs_file << 1 << '\n';
+		print_num_cont_blocks_all(configs_file, config, num_cont_blocks_all);
+		configs_file.close();
+	}
+	else
+		cout << "Unable to open file";
+
+	cout << "File has been successfully written\n";
+}
+
+// Create a file that stores multi configs and their cont. rows/cols/re.rows/re.cols 
+void Utility::write_file(const vector<Puzzle>& configs, const vector<unsigned long long int>& nums_cont_blocks_all) {
+	ofstream configs_file(ask_file_name());
+
+	if (configs_file) {
+		configs_file << configs.size() << '\n';
+		print_num_cont_blocks_all(configs_file, configs, nums_cont_blocks_all);
+		configs_file.close();
+	}
+	else
+		cout << "Unable to open file";
+
+	cout << "File has been successfully written\n";
 }
 
 // Get the configurations from the file
 // remove configs as argument as well
 void Utility::get_configs(ifstream& configs_file) {
-	int num_lines = 0;	// number of lines excluding the empty line; it's used to calculate the number of rows and cols
 	string line;
 	configs_file >> *num_configs;
 	configs.resize(*num_configs);
 	configs_file.ignore(numeric_limits<streamsize>::max(), '\n'); // ignore the first line of the file
 
-	for (vector<int>& config : configs) {
+	for (Puzzle& config : configs) {
+		int num_lines = 0;	// number of lines excluding the empty line; it's used to calculate the number of rows and cols
 		while (getline(configs_file, line) && !line.empty()) {
 			num_lines++;
 			int value;
 			istringstream row(line);
 
 			while (row >> value)
-				config.push_back(value);
+				config.add_value(value);
 		}
+		config.set_num_row_col(num_lines);
 	}
-
-	*num_row_col = num_lines / *num_configs;
 }
 
 // Make this void instead
-void Utility::read_configs_file(string file_name) throw (invalid_argument) {
+void Utility::read_file() throw (invalid_argument) {
+	configs.clear();	// clean the vector before reading
+	string file_name = ask_file_name();
 	ifstream configs_file(file_name);
-
+	
 	// read the file
 	if (configs_file) {
 		get_configs(configs_file);
+		configs_file.close();
+		cout << "File has been successfully read\n";
+		solve_config(configs);
 	}
-	else
-		throw invalid_argument("Error: " + file_name + " does not exist");
+	else {
+		configs_file.clear();	// just in case if somehow the file is being rewritten
+		throw invalid_argument(file_name + " does not exist");
+	}
+}
 
-	configs_file.close();
+// Count the number of possible continuous blocks
+void Utility::count_num_pos_cont_blocks(const vector<unsigned int>& config_copy, const int& num_steps, const int& shift, int& num_cont_blocks, int& num_shifts_made) {
+	for (size_t i = 1; i < config_copy.size(); i++) {
+		if (config_copy.at(i) - config_copy.at((_int64)i - 1) == 1) {
+			num_shifts_made++;
+
+			if (num_shifts_made % num_steps == 0) {
+				i -= shift;
+				num_shifts_made = 0;	// reset the number of step here
+				num_cont_blocks++;
+			}
+		}
+		else {
+			num_shifts_made = 0;	// reset the number of step here
+		}
+	}
+}
+
+// Solve a single configuration
+void Utility::solve_config(const Puzzle& config) {
+	int partial_num = ask_for_num("Which partial continuous would you like to do? ", "Invalid input. Please enter a number greater than one", 1);
+	unsigned long long int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
+	print_num_cont_blocks_all(config, num_cont_blocks_all);
+	print_num_cont_blocks_advance(config, partial_num);
+
+	if (ask_yes_no("Would you like to save the solution(s)?"))
+		write_file(config, num_cont_blocks_all);
+}
+
+// Solve multiple configuration
+void Utility::solve_config(const vector<Puzzle>& configs) {
+	vector<unsigned long long int> nums_cont_blocks_all;
+	int partial_num = ask_for_num("Which partial continuous would you like to do? ", "Invalid input. Please enter a number greater than one", 1);
+
+	for (const Puzzle& config : configs) {
+		unsigned long long int num_cont_blocks_all = count_cont_blocks_all(config, partial_num);
+		print_num_cont_blocks_all(config, num_cont_blocks_all);
+		nums_cont_blocks_all.push_back(num_cont_blocks_all);
+	}
+
+	if (ask_yes_no("Would you like to save the solution(s)?"))
+		write_file(configs, nums_cont_blocks_all);
 }

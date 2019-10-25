@@ -14,16 +14,20 @@ using namespace std;
 // Puzzle clas
 class Puzzle {
 public:
-	const static int DEFAULT_NUM_ROW_COL = 4;
-	Puzzle() throw (invalid_argument);
-	Puzzle(int nrc) throw (invalid_argument);
+	Puzzle();
 	~Puzzle();
+	Puzzle(const Puzzle& src);
+	Puzzle& operator=(const Puzzle& src);
 	friend ostream& operator<<(ostream& ostr, const Puzzle& pzl);
+	int get_num_row_col() const { return *num_row_col; }
+	vector<unsigned int> get_config() const { return config; }
 	bool is_existed(const int& index, const int& curr_value) const;
-	bool is_in_range(const int& curr_value) const;
-	void create_manual_config();
-	void create_pseudo_random_config();
+	bool is_in_range(const int& curr_value) const { return curr_value > 0 && curr_value <= (*num_row_col) * (*num_row_col) + (*num_row_col); }
+	void add_value(const int& value) { config.push_back(value); }
+	void set_num_row_col(const int& value) { *num_row_col = value; }
+	void create_manual_config(const int& nrc) throw (length_error);
+	void create_pseudo_random_config(const int& nrc) throw (length_error);
 private:
-	int num_row_col;
-	vector<int> config;
+	int* num_row_col;
+	vector<unsigned int> config;
 };
